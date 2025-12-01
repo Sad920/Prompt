@@ -1,136 +1,152 @@
-const equationCountSelect = document.getElementById('equationCount');
-const grid = document.getElementById('equationsGrid');
-const solveButton = document.getElementById('solve');
-const generateButton = document.getElementById('generate');
-const solutionContainer = document.getElementById('solution');
+const aRowsSelect = document.getElementById('aRows');
+const aColsSelect = document.getElementById('aCols');
+const bColsSelect = document.getElementById('bCols');
+const updateButton = document.getElementById('update');
+const calculateButton = document.getElementById('calculate');
+const matrixAContainer = document.getElementById('matrixA');
+const matrixBContainer = document.getElementById('matrixB');
+const resultContainer = document.getElementById('result');
 const statusText = document.getElementById('status');
-const methodSelect = document.getElementById('method');
+const aSizeText = document.getElementById('aSize');
+const bSizeText = document.getElementById('bSize');
 
-function buildGrid() {
-  const n = Number(equationCountSelect.value);
-  grid.innerHTML = '';
+const SIZE_OPTIONS = [2, 3, 4, 5, 6];
 
+function populateSelect(select) {
+  SIZE_OPTIONS.forEach((size) => {
+    const option = document.createElement('option');
+    option.value = size;
+    option.textContent = size;
+    select.appendChild(option);
+  });
+}
+
+function buildMatrix(container, rows, cols, labelPrefix) {
+  container.innerHTML = '';
   const table = document.createElement('table');
   table.className = 'table';
 
-  const thead = document.createElement('thead');
-  const headRow = document.createElement('tr');
-  for (let i = 1; i <= n; i += 1) {
-    const th = document.createElement('th');
-    th.textContent = `x${i}`;
-    headRow.appendChild(th);
-  }
-  const constantTh = document.createElement('th');
-  constantTh.textContent = 'Constant';
-  headRow.appendChild(constantTh);
-  thead.appendChild(headRow);
-  table.appendChild(thead);
-
   const tbody = document.createElement('tbody');
-  for (let row = 0; row < n; row += 1) {
+  for (let r = 0; r < rows; r += 1) {
     const tr = document.createElement('tr');
-    for (let col = 0; col <= n; col += 1) {
+    for (let c = 0; c < cols; c += 1) {
       const td = document.createElement('td');
       const input = document.createElement('input');
       input.type = 'number';
       input.step = 'any';
-      input.className = 'coeff-input';
       input.placeholder = '0';
-      input.setAttribute('aria-label', col === n ? `Constant for equation ${row + 1}` : `x${col + 1} for equation ${row + 1}`);
+      input.className = 'coeff-input';
+      input.setAttribute('aria-label', `${labelPrefix} row ${r + 1} column ${c + 1}`);
       td.appendChild(input);
       tr.appendChild(td);
     }
     tbody.appendChild(tr);
   }
-  table.appendChild(tbody);
 
-  grid.appendChild(table);
+  table.appendChild(tbody);
+  container.appendChild(table);
+}
+
+function updateSizeLabels(aRows, aCols, bCols) {
+  aSizeText.textContent = `${aRows} × ${aCols}`;
+  bSizeText.textContent = `${aCols} × ${bCols}`;
+}
+
+function buildMatrices() {
+  const aRows = Number(aRowsSelect.value);
+  const aCols = Number(aColsSelect.value);
+  const bCols = Number(bColsSelect.value);
+
+  updateSizeLabels(aRows, aCols, bCols);
+  buildMatrix(matrixAContainer, aRows, aCols, 'Matrix A');
+  buildMatrix(matrixBContainer, aCols, bCols, 'Matrix B');
+  resultContainer.innerHTML = '';
   statusText.textContent = '';
   statusText.classList.remove('error');
-  solutionContainer.innerHTML = '';
 }
 
-function readMatrix() {
-  const inputs = Array.from(grid.querySelectorAll('tbody tr'));
-  if (!inputs.length) return null;
-  const n = Number(equationCountSelect.value);
-  const matrix = [];
-  const constants = [];
-  for (const row of inputs) {
-    const values = Array.from(row.querySelectorAll('input'));
-    const coeffs = values.slice(0, n).map((input) => Number(input.value || 0));
-    const constant = Number(values[n].value || 0);
-    matrix.push(coeffs);
-    constants.push(constant);
+function readMatrix(container) {
+  const rows = Array.from(container.querySelectorAll('tbody tr'));
+  return rows.map((row) => Array.from(row.querySelectorAll('input')).map((input) => Number(input.value || 0)));
+}
+
+function multiplyMatrices(A, B) {
+  const aRows = A.length;
+  const aCols = A[0]?.length || 0;
+  const bRows = B.length;
+  const bCols = B[0]?.length || 0;
+
+  if (!aRows || !aCols || !bRows || !bCols) {
+    return { error: 'Please fill out both matrices before calculating.' };
   }
-  return { matrix, constants };
-}
 
-function solveLinearSystem(A, b) {
-  const n = A.length;
-  const mat = A.map((row, idx) => [...row, b[idx]]);
+  if (aCols !== bRows) {
+    return { error: 'Matrix dimensions are incompatible (columns of A must match rows of B).' };
+  }
 
-  for (let i = 0; i < n; i += 1) {
-    let maxRow = i;
-    for (let k = i + 1; k < n; k += 1) {
-      if (Math.abs(mat[k][i]) > Math.abs(mat[maxRow][i])) {
-        maxRow = k;
+  const result = Array.from({ length: aRows }, () => Array(bCols).fill(0));
+
+  for (let i = 0; i < aRows; i += 1) {
+    for (let j = 0; j < bCols; j += 1) {
+      let sum = 0;
+      for (let k = 0; k < aCols; k += 1) {
+        sum += A[i][k] * B[k][j];
       }
-    }
-
-    if (Math.abs(mat[maxRow][i]) < 1e-12) {
-      return { error: 'The system does not have a unique solution (zero pivot detected).' };
-    }
-
-    [mat[i], mat[maxRow]] = [mat[maxRow], mat[i]];
-
-    for (let k = i + 1; k < n; k += 1) {
-      const factor = mat[k][i] / mat[i][i];
-      for (let j = i; j <= n; j += 1) {
-        mat[k][j] -= factor * mat[i][j];
-      }
+      result[i][j] = sum;
     }
   }
 
-  const x = Array(n).fill(0);
-  for (let i = n - 1; i >= 0; i -= 1) {
-    let sum = mat[i][n];
-    for (let j = i + 1; j < n; j += 1) {
-      sum -= mat[i][j] * x[j];
-    }
-    x[i] = sum / mat[i][i];
-  }
-  return { solution: x };
+  return { result };
 }
 
-function showSolution(result) {
-  solutionContainer.innerHTML = '';
-  if (result.error) {
-    statusText.textContent = result.error;
+function renderResult(resultMatrix) {
+  resultContainer.innerHTML = '';
+  const table = document.createElement('table');
+  table.className = 'table';
+  const tbody = document.createElement('tbody');
+
+  resultMatrix.forEach((row) => {
+    const tr = document.createElement('tr');
+    row.forEach((value) => {
+      const td = document.createElement('td');
+      td.textContent = Number(value.toFixed(4));
+      tr.appendChild(td);
+    });
+    tbody.appendChild(tr);
+  });
+
+  table.appendChild(tbody);
+  resultContainer.appendChild(table);
+}
+
+function handleCalculate() {
+  const matrixA = readMatrix(matrixAContainer);
+  const matrixB = readMatrix(matrixBContainer);
+  const outcome = multiplyMatrices(matrixA, matrixB);
+
+  if (outcome.error) {
+    statusText.textContent = outcome.error;
     statusText.classList.add('error');
+    resultContainer.innerHTML = '';
     return;
   }
-  statusText.textContent = `Solved using Method ${methodSelect.value.toUpperCase()}`;
+
+  statusText.textContent = 'Calculated A × B successfully.';
   statusText.classList.remove('error');
-  const list = document.createElement('div');
-  list.className = 'solutions-list';
-  result.solution.forEach((value, idx) => {
-    const card = document.createElement('div');
-    card.className = 'solution-card';
-    card.innerHTML = `<strong>x${idx + 1}</strong><div>${Number(value.toFixed(6))}</div>`;
-    list.appendChild(card);
-  });
-  solutionContainer.appendChild(list);
+  renderResult(outcome.result);
 }
 
-function handleSolve() {
-  const data = readMatrix();
-  if (!data) return;
-  const { matrix, constants } = data;
-  const result = solveLinearSystem(matrix, constants);
-  showSolution(result);
+function initializeControls() {
+  [aRowsSelect, aColsSelect, bColsSelect].forEach(populateSelect);
+  aRowsSelect.value = '2';
+  aColsSelect.value = '2';
+  bColsSelect.value = '2';
 }
 
-generateButton.addEventListener('click', buildGrid);
-solveButton.addEventListener('click', handleSolve);
-window.addEventListener('DOMContentLoaded', buildGrid);
+updateButton.addEventListener('click', buildMatrices);
+calculateButton.addEventListener('click', handleCalculate);
+
+window.addEventListener('DOMContentLoaded', () => {
+  initializeControls();
+  buildMatrices();
+});

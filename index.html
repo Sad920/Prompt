@@ -3,49 +3,61 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Linear Equation Solver</title>
+  <title>Matrix Multiplication Visualizer</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <main class="app">
     <header class="hero">
       <div>
-        <p class="eyebrow">Mobile friendly</p>
-        <h1>Linear Equation Solver</h1>
-        <p class="subtitle">Select a method, choose how many equations you have, fill in the coefficients, and calculate the solution.</p>
+        <p class="eyebrow">Interactive math playground</p>
+        <h1>Matrix Multiplication Visualizer</h1>
+        <p class="subtitle">Pick dimensions, type your values into the cells, and instantly see the resulting matrix product.</p>
       </div>
     </header>
 
     <section class="controls">
       <div class="control">
-        <label for="method">Method</label>
-        <select id="method">
-          <option value="w">Method W</option>
-          <option value="v">Method V</option>
-        </select>
+        <label for="aRows">Matrix A rows</label>
+        <select id="aRows"></select>
       </div>
       <div class="control">
-        <label for="equationCount">Number of equations</label>
-        <select id="equationCount">
-          <option value="2">2</option>
-          <option value="3" selected>3</option>
-          <option value="4">4</option>
-          <option value="5">5</option>
-        </select>
+        <label for="aCols">Matrix A columns</label>
+        <select id="aCols"></select>
       </div>
-      <button id="generate" class="ghost">Update inputs</button>
+      <div class="control">
+        <label for="bCols">Matrix B columns</label>
+        <select id="bCols"></select>
+        <p class="hint">Matrix B rows will match A columns automatically.</p>
+      </div>
+      <button id="update" class="ghost">Update matrices</button>
     </section>
 
-    <section class="grid" id="equationsGrid" aria-live="polite"></section>
+    <section class="matrix-section">
+      <div class="matrix-card">
+        <div class="matrix-header">
+          <h2>Matrix A</h2>
+          <p class="hint" id="aSize"></p>
+        </div>
+        <div class="grid" id="matrixA" aria-live="polite"></div>
+      </div>
+      <div class="matrix-card">
+        <div class="matrix-header">
+          <h2>Matrix B</h2>
+          <p class="hint" id="bSize"></p>
+        </div>
+        <div class="grid" id="matrixB" aria-live="polite"></div>
+      </div>
+    </section>
 
     <section class="actions">
-      <button id="solve">Calculate</button>
+      <button id="calculate">Calculate A × B</button>
       <p id="status" class="status" role="status" aria-live="polite"></p>
     </section>
 
     <section class="results" aria-live="polite">
-      <h2>Solution</h2>
-      <div id="solution"></div>
+      <h2>Resulting Matrix</h2>
+      <div id="result"></div>
     </section>
   </main>
   <script src="script.js"></script>
