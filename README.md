@@ -23,5 +23,6 @@ Launch the solver and follow the on-screen menus:
 ./multigrid_solver
 ```
 
-After choosing the cycle type and system size, the program asks for each matrix cell
-`a[i][j]` and right-hand side `b[i]`. Type `c` when prompted to perform the calculation.
+After choosing the cycle type and system size, the main menu guides you through filling the
+visual grid for every matrix cell `a[i][j]` and right-hand side `b[i]`. Press `c` when the
+"[Button]" prompt appears to perform the calculation.

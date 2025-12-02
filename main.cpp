@@ -166,6 +166,12 @@ int main() {
     std::cout << "This program uses Gauss-Seidel smoothing and treats the chosen cycle" << '\n';
     std::cout << "(V or W) as a hint for how much relaxation work to perform." << '\n';
 
+    std::cout << "\n--- Main Menu ---\n";
+    std::cout << "1) Select cycle type (V/W)\n";
+    std::cout << "2) Enter system size\n";
+    std::cout << "3) Fill coefficient grid\n";
+    std::cout << "4) Press [C] Calculate to solve\n";
+
     CycleType cycle = promptCycle();
 
     const int maxEquations = 12;
@@ -177,7 +183,9 @@ int main() {
     std::vector<std::vector<double>> A(n, std::vector<double>(n, 0.0));
     std::vector<double> b(n, 0.0);
 
+    std::cout << "Fill in each cell of the matrix A and the right-hand side b below." << '\n';
     for (int i = 0; i < n; ++i) {
+        std::cout << "\n-- Row " << (i + 1) << " --\n";
         for (int j = 0; j < n; ++j) {
             std::string prompt = "Enter coefficient a[" + std::to_string(i + 1) + "][" +
                                  std::to_string(j + 1) + "]: ";
@@ -186,7 +194,7 @@ int main() {
         b[i] = promptNumber("Enter right-hand side b[" + std::to_string(i + 1) + "]: ");
     }
 
-    std::cout << "\nType 'c' and press Enter to calculate the solution, or any other key to quit: ";
+    std::cout << "\n[Button] Press 'c' + Enter to CALCULATE or any other key to quit: ";
     std::string action;
     std::cin >> action;
     if (action != "c" && action != "C") {
@@ -198,7 +206,7 @@ int main() {
     printSummary(result);
 
     if (!result.converged) {
-        std::cout << "\nNote: The solver stops after a fixed effort. If it did not converge,"
+        std::cout << "\nNote: The solver stops after a fixed effort. If it did not converge," 
                      " try the W-cycle for stronger smoothing or adjust your system" << '\n';
     }
 
