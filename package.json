@@ -1,0 +1,10 @@
+{
+  "name": "historical-photo-gallery",
+  "version": "1.0.0",
+  "description": "Simple static gallery with historical photos and basic DOM test.",
+  "type": "module",
+  "scripts": {
+    "test": "node test/gallery.test.js"
+  },
+  "devDependencies": {}
+}
