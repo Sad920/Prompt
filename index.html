@@ -3,63 +3,22 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Matrix Multiplication Visualizer</title>
+  <title>Historical Photo Gallery</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <main class="app">
-    <header class="hero">
-      <div>
-        <p class="eyebrow">Interactive math playground</p>
-        <h1>Matrix Multiplication Visualizer</h1>
-        <p class="subtitle">Pick dimensions, type your values into the cells, and instantly see the resulting matrix product.</p>
-      </div>
-    </header>
+  <header class="hero">
+    <div class="hero__content">
+      <p class="eyebrow">Time capsule</p>
+      <h1>Historical Photo Gallery</h1>
+      <p class="subtitle">Browse a curated set of moments from history with brief captions to add context.</p>
+    </div>
+  </header>
 
-    <section class="controls">
-      <div class="control">
-        <label for="aRows">Matrix A rows</label>
-        <select id="aRows"></select>
-      </div>
-      <div class="control">
-        <label for="aCols">Matrix A columns</label>
-        <select id="aCols"></select>
-      </div>
-      <div class="control">
-        <label for="bCols">Matrix B columns</label>
-        <select id="bCols"></select>
-        <p class="hint">Matrix B rows will match A columns automatically.</p>
-      </div>
-      <button id="update" class="ghost">Update matrices</button>
-    </section>
-
-    <section class="matrix-section">
-      <div class="matrix-card">
-        <div class="matrix-header">
-          <h2>Matrix A</h2>
-          <p class="hint" id="aSize"></p>
-        </div>
-        <div class="grid" id="matrixA" aria-live="polite"></div>
-      </div>
-      <div class="matrix-card">
-        <div class="matrix-header">
-          <h2>Matrix B</h2>
-          <p class="hint" id="bSize"></p>
-        </div>
-        <div class="grid" id="matrixB" aria-live="polite"></div>
-      </div>
-    </section>
-
-    <section class="actions">
-      <button id="calculate">Calculate A × B</button>
-      <p id="status" class="status" role="status" aria-live="polite"></p>
-    </section>
-
-    <section class="results" aria-live="polite">
-      <h2>Resulting Matrix</h2>
-      <div id="result"></div>
-    </section>
+  <main class="gallery-section">
+    <div class="gallery" id="gallery" aria-live="polite"></div>
   </main>
+
   <script src="script.js"></script>
 </body>
 </html>
